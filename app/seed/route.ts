@@ -103,6 +103,12 @@ async function seedRevenue() {
 
 export async function GET() {
   try {
+    // 检查环境变量是否存在
+    if (!process.env.POSTGRES_URL) {
+      console.log('POSTGRES_URL not found, skipping database seeding');
+      return Response.json({ message: 'Database seeding skipped: No database URL provided' });
+    }
+    
     const result = await sql.begin((sql) => [
       seedUsers(),
       seedCustomers(),
@@ -112,6 +118,7 @@ export async function GET() {
 
     return Response.json({ message: 'Database seeded successfully' });
   } catch (error) {
+    console.error('Error seeding database:', error);
     return Response.json({ error }, { status: 500 });
   }
 }
